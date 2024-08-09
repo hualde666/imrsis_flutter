@@ -8,23 +8,42 @@ import 'package:imresanca/ui/widgets/cargar_carrito.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ListaCatalogo extends StatelessWidget {
-  const ListaCatalogo({
-    super.key,
-  });
+class ListaCatalogo extends StatefulWidget {
+  const ListaCatalogo({super.key});
+  @override
+  State<ListaCatalogo> createState() => ListaCatalogoState();
+}
+
+class ListaCatalogoState extends State<ListaCatalogo> {
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final dbProvider = Provider.of<DbProvider>(context);
-    Future<List<Productos>> listaProductos() async {
-      List<Productos> lista = await dbProvider.getProductos();
-
+    Future<List<Productos>> filtrarDescripcion() async {
+      List<Productos> lista = [];
+      if (searchController.text.isEmpty) {
+        lista = await dbProvider.getProductosDescripcion('');
+      } else {
+        lista = await dbProvider.getProductosDescripcion(searchController.text);
+      }
       return lista;
     }
 
-    //final x = 0;
     return FutureBuilder(
-        future: listaProductos(),
+        future: filtrarDescripcion(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -36,12 +55,13 @@ class ListaCatalogo extends StatelessWidget {
             if (snapshot.hasData) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                //  crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
                     height: 50,
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Container(
                           width: 300,
@@ -52,17 +72,71 @@ class ListaCatalogo extends StatelessWidget {
                                 fontSize: 40,
                               ))),
                       const Spacer(),
-                      IconButton(
-                          onPressed: (() {}),
-                          splashColor: Colors.white54,
-                          icon: const Icon(
-                            Icons.search_outlined,
-                            color: Colors.white54, // Colors.amber,
-                            size: 40,
-                            weight: 30,
+                      GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
+                          child: Container(
+                            height: 80,
+                            width: 800,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 7),
+                            child: TextField(
+                              // enabled: abilitarBusqueda,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontSize: 25.0,
+                                  color: Colors.white,
+                                  height: 1.0),
+                              keyboardType: TextInputType.name,
+                              // inputFormatters: [
+                              //   FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+                              // ],
+                              controller: searchController,
+                              // autofocus: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(25.0))),
+                                labelStyle: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 20),
+                                labelText: 'Descripción :',
+                                suffixIcon:
+                                    // searchController.text.isNotEmpty
+                                    //     ? IconButton(
+                                    //         onPressed: () {
+                                    //           setState(() {
+                                    //             searchController.clear();
+                                    //           });
+                                    //         },
+                                    //         icon: const Icon(
+                                    //           Icons.clear,
+                                    //           color: Colors.white,
+                                    //           size: 30,
+                                    //         ))
+                                    //     :
+                                    IconButton(
+                                        onPressed: () {
+                                          filtrarDescripcion();
+                                          setState(() {});
+                                        },
+                                        icon: const Icon(
+                                          Icons.search_rounded,
+                                          color: Colors.white,
+                                          size: 30,
+                                        )),
+                                focusedBorder: const OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(25.0))),
+                              ),
+                            ),
                           )),
                       const SizedBox(
-                        width: 200,
+                        width: 100,
                       ),
                       // Text('tengo lista')
                     ],
@@ -74,7 +148,7 @@ class ListaCatalogo extends StatelessWidget {
                   Expanded(
                     child: Container(
                       //height: 600,
-                      margin: EdgeInsets.only(
+                      margin: const EdgeInsets.only(
                           top: 10, left: 50, right: 50, bottom: 10),
                       child: listado(snapshot.data),
                     ),
@@ -292,33 +366,6 @@ class FilaCatalogo extends StatelessWidget {
           ),
         ),
       ),
-      // actionsAlignment: MainAxisAlignment.spaceAround,
-      // actions: [
-      //   Container(
-      //     height: 50, // height <= 500 ? 20 : 30,
-      //     child: ElevatedButton(
-      //         style: ElevatedButton.styleFrom(
-      //             //change width and height on your need width = 200 and height = 50
-      //             // minimumSize: Size(30, 20),
-      //             backgroundColor: Color.fromRGBO(249, 75, 11, 1)),
-      //         onPressed: () {},
-      //         child: Text(
-      //           'Si',
-      //           style: TextStyle(
-      //               fontSize: height <= 500 ? 15 : 25, color: Colors.white),
-      //         )),
-      //   ),
-      //   Container(
-      //     height: 50, //height <= 500 ? 20 : 30,
-      //     child: ElevatedButton(
-      //         onPressed: () {},
-      //         child: Text(
-      //           'No',
-      //           style: TextStyle(
-      //               fontSize: height <= 500 ? 15 : 25, color: Colors.white),
-      //         )),
-      //   ),
-      // ],
     );
   }
 }

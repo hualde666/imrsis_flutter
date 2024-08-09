@@ -5,7 +5,7 @@ import 'package:imresanca/modelos/productos.dart';
 import 'package:provider/provider.dart';
 
 class CargarCarrito extends StatelessWidget {
-  CargarCarrito({super.key, required this.producto});
+  const CargarCarrito({super.key, required this.producto});
   final Productos producto;
 
   @override

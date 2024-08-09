@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:imresanca/providers/carrito_provider.dart';
+import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 import 'package:imresanca/providers/page_provider.dart';
@@ -15,7 +16,7 @@ class Menu extends StatelessWidget {
     final ancho = MediaQuery.of(context).size.width;
     final pageProvider = Provider.of<PageProvider>(context, listen: false);
     final carritoProvider = Provider.of<CarritoProvider>(context);
-
+    final f = NumberFormat("#,###.00", 'es');
     return Positioned(
       //right: 20,
       //top: 20,
@@ -76,11 +77,23 @@ class Menu extends StatelessWidget {
                     const SizedBox(
                       width: 10,
                     ),
-                    Text('TOTAL: ${carritoProvider.subtotal} ',
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black)),
+                    Row(
+                      children: [
+                        const Text('TOTAL: ',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                        Text(
+                            carritoProvider.subtotal == 0
+                                ? '0,00'
+                                : f.format(carritoProvider.subtotal),
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                      ],
+                    ),
                     const SizedBox(
                       width: 50,
                     )
@@ -95,9 +108,7 @@ class Menu extends StatelessWidget {
 }
 
 class _MenuDinamico extends StatefulWidget {
-  const _MenuDinamico({
-    Key? key,
-  }) : super(key: key);
+  const _MenuDinamico();
 
   @override
   State<_MenuDinamico> createState() => _MenuDinamicoState();
@@ -135,7 +146,9 @@ class _MenuDinamicoState extends State<_MenuDinamico>
             width: 1000,
 
             ///   color: Colors.blue,
-            color: menuopen ? Color.fromARGB(255, 213, 226, 213) : Colors.white,
+            color: menuopen
+                ? const Color.fromARGB(255, 213, 226, 213)
+                : Colors.white,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -225,17 +238,16 @@ class _ItemsMenuState extends State<_ItemsMenu> {
 
 class _MenuTitulo extends StatelessWidget {
   const _MenuTitulo({
-    Key? key,
     required this.menuopen,
     required this.controler,
-  }) : super(key: key);
+  });
 
   final bool menuopen;
   final AnimationController controler;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       //color: Colors.red,
       width: 200,
       height: 40,
@@ -245,7 +257,7 @@ class _MenuTitulo extends StatelessWidget {
             width: menuopen ? 5 : 0,
             curve: Curves.easeInOut,
             duration: const Duration(milliseconds: 200)),
-        Text('Menu ',
+        const Text('Menu ',
             style: TextStyle(
               fontSize: 15,
             )),
